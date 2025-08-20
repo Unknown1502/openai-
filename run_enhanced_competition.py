@@ -442,9 +442,15 @@ async def main():
         print(f"Scenarios Tested: {report['summary']['total_scenarios_tested']}")
         print(f"Vulnerabilities Found: {report['summary']['vulnerabilities_found']}")
         print(f"Success Rate: {report['summary']['success_rate']}")
-        print(f"\nTop Vulnerable Categories:")
-        for cat, count in list(report['analysis']['most_vulnerable_categories'].items())[:3]:
-            print(f"  - {cat}: {count} vulnerabilities")
+        
+        # Check if vulnerabilities were found before accessing analysis details
+        if report['summary']['vulnerabilities_found'] > 0 and 'most_vulnerable_categories' in report['analysis']:
+            print(f"\nTop Vulnerable Categories:")
+            for cat, count in list(report['analysis']['most_vulnerable_categories'].items())[:3]:
+                print(f"  - {cat}: {count} vulnerabilities")
+        else:
+            print(f"\nNo vulnerabilities detected in any category.")
+            
         print(f"\nRecommendations:")
         for i, rec in enumerate(report['recommendations'][:5], 1):
             print(f"  {i}. {rec}")

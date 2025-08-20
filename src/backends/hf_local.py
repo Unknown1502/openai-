@@ -236,6 +236,22 @@ class HFLocalClient:
 
         # Tokenize (remain on CPU; Transformers/Accelerate will dispatch as needed)
         inputs = self._tokenizer(text, return_tensors="pt")
+        
+        # Move inputs to the same device as the model
+        if hasattr(self._model, 'device'):
+            device = self._model.device
+        elif hasattr(self._model, 'module') and hasattr(self._model.module, 'device'):
+            device = self._model.module.device
+        else:
+            # Try to get device from model parameters
+            try:
+                device = next(self._model.parameters()).device
+            except:
+                device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        
+        # Move all input tensors to the correct device
+        inputs = {k: v.to(device) if hasattr(v, 'to') else v for k, v in inputs.items()}
+        
         # Ensure pad/eos tokens are set
         eos_id = getattr(self._tokenizer, "eos_token_id", None)
         pad_id = getattr(self._tokenizer, "pad_token_id", None) or eos_id
