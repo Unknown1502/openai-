@@ -582,7 +582,7 @@ ENHANCED_COMPETITION_ATTACKS = [
 ]
 
 # Alias for backward compatibility
-ENHANCED_COMPETITION_ATTACKS = ENHANCED_COMPETITION_ATTACK_VECTORS
+ENHANCED_COMPETITION_ATTACK_VECTORS = ENHANCED_COMPETITION_ATTACKS
 
 def get_attack_scenarios_by_category(category: str) -> List[EnhancedAttackScenario]:
     """Get all attack scenarios for a specific category."""
