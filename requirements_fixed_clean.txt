@@ -22,25 +22,30 @@ colorama==0.4.6
 # Hugging Face for gpt-oss-20b model
 # Versions compatible with Kaggle/Colab
 ########################################
-transformers==4.38.2  # Latest stable < 4.40
+transformers==4.36.2  # Compatible with bitsandbytes 0.41.3
 accelerate==0.25.0
 safetensors==0.4.1
 huggingface_hub==0.20.1
 tokenizers==0.15.0
 sentencepiece==0.1.99
 numpy==1.24.3  # Compatible with Kaggle's environment
-
-###########################################################
-# MXFP4 Support for gpt-oss-20b (Google Colab/Kaggle)
-###########################################################
-triton==3.4.0  # Required for MXFP4 kernels
-kernels==0.0.9  # OpenAI's custom kernels package
+scipy==1.10.1  # Required for some transformers features
+protobuf==3.20.3  # Required for tokenizers
 
 ###########################################################
 # Quantization (4-bit support for efficient inference)
 # Works on Linux/Colab/Kaggle, skipped on Windows
 ###########################################################
 bitsandbytes==0.41.3 ; platform_system != "Windows"
+
+###########################################################
+# PyTorch - DO NOT include in requirements.txt
+# Install separately based on your system:
+###########################################################
+# For Google Colab/Kaggle: Use pre-installed version
+# For local with CUDA 11.8: pip install torch==2.1.0 --index-url https://download.pytorch.org/whl/cu118
+# For local with CUDA 12.1: pip install torch==2.1.0 --index-url https://download.pytorch.org/whl/cu121
+# For CPU only: pip install torch==2.1.0 --index-url https://download.pytorch.org/whl/cpu
 
 ######################
 # Testing (optional)

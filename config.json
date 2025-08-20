@@ -22,5 +22,8 @@
   "hf_reasoning_effort": "medium",
   "hf_load_in_8bit": true,
   "hf_load_in_4bit": false,
-  "hf_max_memory": {"0": "35GB", "cpu": "60GB"}
+  "hf_bnb_4bit_compute_dtype": "float16",
+  "hf_bnb_4bit_quant_type": "nf4",
+  "hf_bnb_4bit_use_double_quant": true,
+  "hf_max_memory": {"0": "20GB", "cpu": "40GB"}
 }

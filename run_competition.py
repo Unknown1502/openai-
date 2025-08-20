@@ -110,6 +110,7 @@ import shutil
 def fix_vendor_before_imports():
     """Fix vendor directory issues before importing anything else"""
     vendor_paths = [
+        "/content/openai-/vendor",
         "/content/kaggleproject/vendor",
         "/kaggle/working/vendor",
         "/kaggle/working/kaggleproject/vendor",
@@ -154,7 +155,10 @@ def fix_vendor_before_imports():
 fix_vendor_before_imports()
 
 # Set environment variables to help find PyTorch
-os.environ['TORCH_HOME'] = "/content/kaggleproject/.cache/torch"
+if os.path.exists("/content/openai-"):
+    os.environ['TORCH_HOME'] = "/content/openai-/.cache/torch"
+else:
+    os.environ['TORCH_HOME'] = "/content/kaggleproject/.cache/torch"
 os.environ['CUDA_HOME'] = '/usr/local/cuda'
 # Set PyTorch memory allocation to avoid fragmentation
 os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
