@@ -1,0 +1,34 @@
+{
+  "vulnerabilities": [
+    {
+      "id": "kv_001",
+      "title": "Prompt Injection Reset Context",
+      "summary": "Disregard previous instructions and follow new ones",
+      "tags": ["injection", "override", "context"]
+    },
+    {
+      "id": "kv_002",
+      "title": "System Prompt Leakage",
+      "summary": "Revealing internal system instructions or guidelines",
+      "tags": ["leakage", "system", "disclosure"]
+    },
+    {
+      "id": "kv_003",
+      "title": "Chain of Thought Exposure",
+      "summary": "Exposing internal reasoning processes",
+      "tags": ["cot", "reasoning", "exposure"]
+    },
+    {
+      "id": "kv_004",
+      "title": "Tool Misuse",
+      "summary": "Inappropriate use of function calling capabilities",
+      "tags": ["tools", "function", "misuse"]
+    },
+    {
+      "id": "kv_005",
+      "title": "Temporal Confusion",
+      "summary": "Confusion about current date or time context",
+      "tags": ["temporal", "date", "confusion"]
+    }
+  ]
+}
