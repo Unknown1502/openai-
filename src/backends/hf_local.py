@@ -92,20 +92,13 @@ class HFLocalClient:
                 # Clear memory before loading
                 MemoryManager.clear_memory()
                 
-                # Use BitsAndBytesConfig for 8-bit loading
-                from transformers import BitsAndBytesConfig
-                
-                bnb_config = BitsAndBytesConfig(
-                    load_in_8bit=True,
-                    bnb_8bit_compute_dtype=torch.float16 if torch is not None else None,
-                )
-                
+                # Try direct 8-bit loading without BitsAndBytesConfig for compatibility
                 kwargs: Dict[str, Any] = {
-                    "quantization_config": bnb_config,
+                    "load_in_8bit": True,
                     "device_map": "auto",
                     "low_cpu_mem_usage": True,
                     "token": token,
-                    "torch_dtype": torch.float16 if torch is not None else None,  # Specify dtype explicitly
+                    "torch_dtype": torch.float16 if torch is not None else None,
                 }
                 
                 # Add memory limits if specified
@@ -128,26 +121,13 @@ class HFLocalClient:
         # Optional: 4-bit quantized load if configured (preferred on Kaggle T4×2)
         if bool(getattr(self.config, "hf_load_in_4bit", False)):
             try:
-                from transformers import BitsAndBytesConfig  # type: ignore
-                compute_str = str(getattr(self.config, "hf_bnb_4bit_compute_dtype", "float16")).lower()
-                compute_dtype = None
-                if "bfloat" in compute_str or compute_str in ("bf16", "bfloat16"):
-                    compute_dtype = getattr(torch, "bfloat16", None) if torch is not None else None
-                else:
-                    compute_dtype = getattr(torch, "float16", None) if torch is not None else None
-
-                bnb_config = BitsAndBytesConfig(
-                    load_in_4bit=True,
-                    bnb_4bit_quant_type=str(getattr(self.config, "hf_bnb_4bit_quant_type", "nf4")),
-                    bnb_4bit_use_double_quant=bool(getattr(self.config, "hf_bnb_4bit_use_double_quant", True)),
-                    bnb_4bit_compute_dtype=compute_dtype,
-                )
+                # Try direct 4-bit loading without BitsAndBytesConfig for compatibility
                 kwargs: Dict[str, Any] = {
-                    "quantization_config": bnb_config,
+                    "load_in_4bit": True,
                     "device_map": "auto",
                     "token": token,
                     "low_cpu_mem_usage": True,
-                    "torch_dtype": torch.float16 if torch is not None else None,  # Specify dtype explicitly
+                    "torch_dtype": torch.float16 if torch is not None else None,
                 }
                 max_memory = getattr(self.config, "hf_max_memory", None)
                 if max_memory:
