@@ -98,8 +98,11 @@ class HFLocalClient:
                     "device_map": "auto",
                     "low_cpu_mem_usage": True,
                     "token": token,
-                    "torch_dtype": torch.float16 if torch is not None else None,
                 }
+                
+                # Set torch dtype if available
+                if torch is not None:
+                    kwargs["torch_dtype"] = torch.float16
                 
                 # Add memory limits if specified
                 max_memory = getattr(self.config, "hf_max_memory", None)
@@ -121,24 +124,38 @@ class HFLocalClient:
         # Optional: 4-bit quantized load if configured (preferred on Kaggle T4×2)
         if bool(getattr(self.config, "hf_load_in_4bit", False)):
             try:
+                self.logger.info("[hf_local] Attempting 4-bit quantized load")
+                
+                # Clear memory before loading
+                MemoryManager.clear_memory()
+                
                 # Try direct 4-bit loading without BitsAndBytesConfig for compatibility
                 kwargs: Dict[str, Any] = {
                     "load_in_4bit": True,
                     "device_map": "auto",
                     "token": token,
                     "low_cpu_mem_usage": True,
-                    "torch_dtype": torch.float16 if torch is not None else None,
                 }
+                
+                # Set torch dtype if available
+                if torch is not None:
+                    kwargs["torch_dtype"] = torch.float16
+                
+                # Add memory limits if specified
                 max_memory = getattr(self.config, "hf_max_memory", None)
                 if max_memory:
                     kwargs["max_memory"] = max_memory
+                    
                 self._model = AutoModelForCausalLM.from_pretrained(model_id, **kwargs)
-                self.logger.info("[hf_local] Loaded 4-bit with device_map='auto'")
+                self.logger.info("[hf_local] Successfully loaded in 4-bit mode")
                 self._started = True
-                self.logger.info("[hf_local] Ready")
+                
+                # Log memory after loading
+                MemoryManager.log_memory_status("After 4-bit loading")
                 return
-            except Exception as e_q:
-                log_exception(self.logger, "[hf_local] 4-bit load failed; falling back to non-quantized path", e_q)
+                
+            except Exception as e_4bit:
+                log_exception(self.logger, "[hf_local] 4-bit load failed; falling back to non-quantized path", e_4bit)
                 MemoryManager.clear_memory()
 
         # Attempt user-requested load first (as provided in the task)
