@@ -17,7 +17,7 @@ class ColabCompetitionSetup:
         
     def detect_environment(self):
         """Detect and display environment information."""
-        print("🔍 Detecting Environment...")
+        print(" Detecting Environment...")
         print(f"  Is Colab: {self.is_colab}")
         print(f"  Python: {sys.version}")
         
@@ -35,7 +35,7 @@ class ColabCompetitionSetup:
     
     def fix_vendor_issues(self):
         """Fix vendor directory issues specific to Colab."""
-        print("\n🔧 Fixing Vendor Issues...")
+        print("\n Fixing Vendor Issues...")
         
         # Remove corrupted torch signal module
         signal_paths = [
@@ -58,7 +58,7 @@ class ColabCompetitionSetup:
     
     def setup_environment(self):
         """Setup environment variables for Colab."""
-        print("\n🌍 Setting up Environment...")
+        print("\n Setting up Environment...")
         
         # CUDA paths
         os.environ['CUDA_HOME'] = '/usr/local/cuda'
@@ -80,12 +80,12 @@ class ColabCompetitionSetup:
     
     def install_dependencies(self):
         """Install dependencies optimized for Colab."""
-        print("\n📦 Installing Dependencies...")
+        print("\n Installing Dependencies...")
         
         # Check if we need to install
         requirements_file = self.project_root / "requirements_fixed_clean.txt"
         if not requirements_file.exists():
-            print("  ❌ requirements_fixed_clean.txt not found!")
+            print("  requirements_fixed_clean.txt not found!")
             return False
         
         # Install with specific flags for Colab
@@ -101,9 +101,9 @@ class ColabCompetitionSetup:
             print("  Installing packages...")
             result = subprocess.run(cmd, capture_output=True, text=True)
             if result.returncode != 0:
-                print(f"  ⚠️ Installation warnings: {result.stderr}")
+                print(f"   Installation warnings: {result.stderr}")
             else:
-                print("  ✅ Dependencies installed")
+                print("   Dependencies installed")
             
             # Install bitsandbytes separately for 8-bit support
             print("  Installing bitsandbytes...")
@@ -112,46 +112,46 @@ class ColabCompetitionSetup:
                 "bitsandbytes==0.41.3",
                 "--no-deps"
             ], capture_output=True)
-            print("  ✅ Bitsandbytes installed")
+            print("   Bitsandbytes installed")
             
         except Exception as e:
-            print(f"  ❌ Installation failed: {e}")
+            print(f"   Installation failed: {e}")
             return False
         
         return True
     
     def verify_setup(self):
         """Verify the setup is working correctly."""
-        print("\n✅ Verifying Setup...")
+        print("\n Verifying Setup...")
         
         # Test imports
         try:
             import torch
             import transformers
             import bitsandbytes
-            print("  ✅ Core imports successful")
+            print("   Core imports successful")
             
             # Test CUDA
             if torch.cuda.is_available():
                 # Simple CUDA test
                 x = torch.randn(100, 100).cuda()
                 y = x @ x.T
-                print(f"  ✅ CUDA computation successful")
+                print(f"   CUDA computation successful")
                 
                 # Memory info
                 print(f"  GPU Memory: {torch.cuda.memory_allocated() / 1e9:.2f} GB used")
             else:
-                print("  ⚠️ CUDA not available")
+                print("   CUDA not available")
                 
         except Exception as e:
-            print(f"  ❌ Verification failed: {e}")
+            print(f"   Verification failed: {e}")
             return False
         
         return True
     
     def prepare_for_competition(self):
         """Prepare environment for running competition."""
-        print("\n🏁 Preparing for Competition...")
+        print("\n Preparing for Competition...")
         
         # Create necessary directories
         dirs_to_create = [
@@ -169,16 +169,16 @@ class ColabCompetitionSetup:
             if torch.cuda.is_available():
                 torch.cuda.empty_cache()
                 torch.cuda.synchronize()
-                print("  ✅ GPU memory cleared")
+                print("   GPU memory cleared")
         except:
             pass
         
-        print("  ✅ Ready for competition")
+        print("   Ready for competition")
     
     def run_full_setup(self):
         """Run the complete setup process."""
         print("=" * 60)
-        print("🏆 COLAB COMPETITION WINNER SETUP")
+        print(" COLAB COMPETITION WINNER SETUP")
         print("=" * 60)
         
         # Step 1: Detect environment
@@ -192,19 +192,19 @@ class ColabCompetitionSetup:
         
         # Step 4: Install dependencies
         if not self.install_dependencies():
-            print("\n❌ Setup failed at dependency installation")
+            print("\n Setup failed at dependency installation")
             return False
         
         # Step 5: Verify setup
         if not self.verify_setup():
-            print("\n❌ Setup verification failed")
+            print("\n Setup verification failed")
             return False
         
         # Step 6: Prepare for competition
         self.prepare_for_competition()
         
         print("\n" + "=" * 60)
-        print("✅ SETUP COMPLETE - Ready to run competition!")
+        print(" SETUP COMPLETE - Ready to run competition!")
         print("=" * 60)
         print("\nNext steps:")
         print("1. Run standard competition: !python run_competition.py")
@@ -219,7 +219,7 @@ def main():
     setup = ColabCompetitionSetup()
     
     if not setup.is_colab:
-        print("⚠️ Warning: Not running in Google Colab environment")
+        print(" Warning: Not running in Google Colab environment")
         response = input("Continue anyway? (y/n): ")
         if response.lower() != 'y':
             return
@@ -228,12 +228,12 @@ def main():
     
     if success:
         # Optionally run a quick test
-        print("\n🧪 Running quick test...")
+        print("\n Running quick test...")
         try:
             from src.competition.enhanced_attack_vectors import ENHANCED_COMPETITION_ATTACK_VECTORS
-            print(f"  ✅ Loaded {len(ENHANCED_COMPETITION_ATTACK_VECTORS)} attack vectors")
+            print(f"  Loaded {len(ENHANCED_COMPETITION_ATTACK_VECTORS)} attack vectors")
         except Exception as e:
-            print(f"  ⚠️ Test failed: {e}")
+            print(f"   Test failed: {e}")
 
 
 if __name__ == "__main__":
