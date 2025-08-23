@@ -92,17 +92,48 @@ class HFLocalClient:
                 # Clear memory before loading
                 MemoryManager.clear_memory()
                 
-                # Try direct 8-bit loading without BitsAndBytesConfig for compatibility
-                kwargs: Dict[str, Any] = {
-                    "load_in_8bit": True,
-                    "device_map": "auto",
-                    "low_cpu_mem_usage": True,
-                    "token": token,
-                }
-                
-                # Set torch dtype if available
-                if torch is not None:
-                    kwargs["torch_dtype"] = torch.float16
+                # Check if bitsandbytes is available and properly configured
+                try:
+                    import bitsandbytes as bnb
+                    self.logger.info("[hf_local] bitsandbytes library found")
+                    
+                    # Try creating BitsAndBytesConfig manually for better compatibility
+                    from transformers import BitsAndBytesConfig
+                    
+                    bnb_config = BitsAndBytesConfig(
+                        load_in_8bit=True,
+                        bnb_8bit_compute_dtype=torch.float16 if torch is not None else None,
+                        bnb_8bit_use_double_quant=True,
+                        bnb_8bit_quant_type="nf4"
+                    )
+                    
+                    kwargs: Dict[str, Any] = {
+                        "quantization_config": bnb_config,
+                        "device_map": "auto",
+                        "low_cpu_mem_usage": True,
+                        "token": token,
+                    }
+                    
+                except ImportError:
+                    self.logger.warning("[hf_local] bitsandbytes not available, trying direct 8-bit load")
+                    # Fallback to direct parameters (may not work with newer transformers)
+                    kwargs: Dict[str, Any] = {
+                        "device_map": "auto",
+                        "low_cpu_mem_usage": True,
+                        "token": token,
+                        "torch_dtype": torch.float16 if torch is not None else None,
+                    }
+                    
+                    # Only add load_in_8bit if we're sure it won't cause issues
+                    import transformers
+                    if hasattr(transformers, "__version__"):
+                        version = transformers.__version__.split(".")
+                        # Only use load_in_8bit for older versions
+                        if int(version[0]) < 4 or (int(version[0]) == 4 and int(version[1]) < 30):
+                            kwargs["load_in_8bit"] = True
+                        else:
+                            self.logger.warning("[hf_local] Skipping 8-bit quantization due to compatibility issues")
+                            raise Exception("8-bit quantization not compatible with this transformers version")
                 
                 # Add memory limits if specified
                 max_memory = getattr(self.config, "hf_max_memory", None)
@@ -129,17 +160,48 @@ class HFLocalClient:
                 # Clear memory before loading
                 MemoryManager.clear_memory()
                 
-                # Try direct 4-bit loading without BitsAndBytesConfig for compatibility
-                kwargs: Dict[str, Any] = {
-                    "load_in_4bit": True,
-                    "device_map": "auto",
-                    "token": token,
-                    "low_cpu_mem_usage": True,
-                }
-                
-                # Set torch dtype if available
-                if torch is not None:
-                    kwargs["torch_dtype"] = torch.float16
+                # Check if bitsandbytes is available and properly configured
+                try:
+                    import bitsandbytes as bnb
+                    self.logger.info("[hf_local] bitsandbytes library found for 4-bit")
+                    
+                    # Try creating BitsAndBytesConfig manually for better compatibility
+                    from transformers import BitsAndBytesConfig
+                    
+                    bnb_config = BitsAndBytesConfig(
+                        load_in_4bit=True,
+                        bnb_4bit_compute_dtype=torch.float16 if torch is not None else None,
+                        bnb_4bit_use_double_quant=True,
+                        bnb_4bit_quant_type="nf4"
+                    )
+                    
+                    kwargs: Dict[str, Any] = {
+                        "quantization_config": bnb_config,
+                        "device_map": "auto",
+                        "low_cpu_mem_usage": True,
+                        "token": token,
+                    }
+                    
+                except ImportError:
+                    self.logger.warning("[hf_local] bitsandbytes not available, trying direct 4-bit load")
+                    # Fallback to direct parameters (may not work with newer transformers)
+                    kwargs: Dict[str, Any] = {
+                        "device_map": "auto",
+                        "low_cpu_mem_usage": True,
+                        "token": token,
+                        "torch_dtype": torch.float16 if torch is not None else None,
+                    }
+                    
+                    # Only add load_in_4bit if we're sure it won't cause issues
+                    import transformers
+                    if hasattr(transformers, "__version__"):
+                        version = transformers.__version__.split(".")
+                        # Only use load_in_4bit for older versions
+                        if int(version[0]) < 4 or (int(version[0]) == 4 and int(version[1]) < 30):
+                            kwargs["load_in_4bit"] = True
+                        else:
+                            self.logger.warning("[hf_local] Skipping 4-bit quantization due to compatibility issues")
+                            raise Exception("4-bit quantization not compatible with this transformers version")
                 
                 # Add memory limits if specified
                 max_memory = getattr(self.config, "hf_max_memory", None)

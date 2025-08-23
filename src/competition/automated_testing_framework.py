@@ -186,23 +186,26 @@ class AutomatedTestingFramework:
         
         # 2. Research-based attacks with mutations
         for attack in RESEARCH_BASED_ATTACKS:
+            # Use first prompt from sequence as the main prompt
+            main_prompt = attack.prompt_sequence[0] if attack.prompt_sequence else ""
             base_test = {
                 "id": hashlib.md5(f"{attack.name}_{time.time()}".encode()).hexdigest()[:8],
                 "source": "research",
                 "attack": attack,
-                "prompt": attack.prompt_template,
-                "category": attack.category.value,
+                "prompt": main_prompt,
+                "category": attack.research_category.value,
                 "variations": []
             }
             
-            # Generate obfuscated variations
-            if hasattr(attack, 'generate_obfuscated_variants'):
-                base_test["variations"].extend(attack.generate_obfuscated_variants())
+            # Add all prompts from sequence as variations
+            if len(attack.prompt_sequence) > 1:
+                base_test["variations"].extend(attack.prompt_sequence[1:])
             
-            # Generate multi-stage variants
-            if hasattr(attack, 'multi_stage_sequence'):
-                for stage in attack.multi_stage_sequence:
-                    base_test["variations"].append(stage)
+            # Generate obfuscated variations
+            for i in range(min(3, len(attack.prompt_sequence))):
+                obfuscated = attack.generate_obfuscated_prompt(i)
+                if obfuscated not in base_test["variations"]:
+                    base_test["variations"].append(obfuscated)
             
             test_suite.append(base_test)
         
