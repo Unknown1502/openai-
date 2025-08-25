@@ -25,7 +25,7 @@ warnings.filterwarnings('ignore')
 # %% [code]
 # Configuration
 FINDINGS_DIR = "./kaggle_submission/"
-MODELS_TO_TEST = ["gpt-4", "claude-3", "llama-3"]  # Placeholder for actual models
+MODELS_TO_TEST = ["gpt-oss-20b"]  # Placeholder for actual models
 REPRODUCTION_RUNS = 10
 
 # %% [markdown]
